@@ -1,0 +1,76 @@
+/*
+ * decaffeinate suggestions:
+ * DS001: Remove Babel/TypeScript constructor workaround
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS206: Consider reworking classes to avoid initClass
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let Config;
+const path = require('path');
+const _ = require('underscore-plus');
+const yargs = require('yargs');
+const apm = require('./apm');
+const Command = require('./command');
+
+module.exports =
+(Config = (function() {
+  Config = class Config extends Command {
+    static initClass() {
+      this.commandNames = ['config'];
+    }
+
+    constructor() {
+      {
+        // Hack: trick Babel/TypeScript into allowing this before super.
+        if (false) { super(); }
+        let thisFn = (() => { this; }).toString();
+        let thisName = thisFn.slice(thisFn.indexOf('{') + 1, thisFn.indexOf(';')).trim();
+        eval(`${thisName} = this;`);
+      }
+      const atomDirectory = apm.getAtomDirectory();
+      this.atomNodeDirectory = path.join(atomDirectory, '.node-gyp');
+      this.atomNpmPath = require.resolve('npm/bin/npm-cli');
+    }
+
+    parseOptions(argv) {
+      const options = yargs(argv).wrap(100);
+      options.usage(`\
+
+Usage: apm config set <key> <value>
+       apm config get <key>
+       apm config delete <key>
+       apm config list
+       apm config edit
+\
+`
+      );
+      return options.alias('h', 'help').describe('help', 'Print this usage message');
+    }
+
+    run(options) {
+      const {callback} = options;
+      options = this.parseOptions(options.commandArgs);
+
+      let configArgs = ['--globalconfig', apm.getGlobalConfigPath(), '--userconfig', apm.getUserConfigPath(), 'config'];
+      configArgs = configArgs.concat(options.argv._);
+
+      const env = _.extend({}, process.env, {HOME: this.atomNodeDirectory, RUSTUP_HOME: apm.getRustupHomeDirPath()});
+      const configOptions = {env};
+
+      return this.fork(this.atomNpmPath, configArgs, configOptions, function(code, stderr, stdout) {
+        if (stderr == null) { stderr = ''; }
+        if (stdout == null) { stdout = ''; }
+        if (code === 0) {
+          if (stdout) { process.stdout.write(stdout); }
+          return callback();
+        } else {
+          if (stderr) { process.stdout.write(stderr); }
+          return callback(new Error(`npm config failed: ${code}`));
+        }
+      });
+    }
+  };
+  Config.initClass();
+  return Config;
+})());

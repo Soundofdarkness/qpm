@@ -1,0 +1,61 @@
+{
+  "name": "quarks-package-manager",
+  "description": "Quarks package manager",
+  "version": "1.18.7",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/apm.git"
+  },
+  "bugs": {
+    "url": "https://github.com/atom/apm/issues"
+  },
+  "main": "./lib/apm.js",
+  "bin": {
+    "apm": "./bin/apm"
+  },
+  "scripts": {
+    "build": "node script/check-version.js && grunt",
+    "prepublish": "grunt prepublish",
+    "test": "node script/check-version.js && grunt test",
+    "check-version": "node version.js"
+  },
+  "dependencies": {
+    "asar-require": "0.3.0",
+    "async": "~2.5.0",
+    "colors": "~1.1.2",
+    "first-mate": "7.0.7",
+    "fs-plus": "3.x",
+    "git-utils": "^5.0",
+    "hosted-git-info": "^2.1.4",
+    "keytar": "^4.0",
+    "mv": "2.1.1",
+    "ncp": "~2.0.0",
+    "npm": "5.4.2",
+    "node-gyp": "3.6.2",
+    "open": "0.0.5",
+    "plist": "git+https://github.com/nathansobo/node-plist.git",
+    "q": "~1.5.0",
+    "read": "~1.0.5",
+    "request": "^2.72.0",
+    "rimraf": "^2.5.2",
+    "season": "^6.0",
+    "semver": "^5.1.0",
+    "tar": "^4.0.1",
+    "temp": "~0.8.3",
+    "underscore-plus": "1.x",
+    "wordwrap": "1.0.0",
+    "wrench": "~1.5.1",
+    "yargs": "^3.23.0"
+  },
+  "devDependencies": {
+    "coffee-script": "^1.8.0",
+    "express": "~4.15.4",
+    "grunt": "^1.0.1",
+    "grunt-coffeelint": "0.0.16",
+    "grunt-cli": "^1.2.0",
+    "grunt-contrib-coffee": "^1.0.0",
+    "grunt-shell": "^2.1.0",
+    "jasmine-focused": ">=1.0.7 <2.0"
+  }
+}
